@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="permission">
+
+    <select id="findPermissionByRoleId" resultType="permission">
+      select m.id, m.name
+      from sys_menu m left join sys_role_menu_mapping rm on m.id = rm.menu_id
+      where rm.role_id = #{roleId}
+   </select>
+
+    <select id="findPermissionByParentId" resultType="permission" parameterType="map">
+      select id, parent_id, `name`, title, icon, url, component
+      from sys_menu
+      <where>
+          <if test="userId != null">
+              id in (
+                  select menu_id from sys_role_menu_mapping where role_id in (
+                      select role_id from sys_role_user_mapping where user_id = #{userId}
+                  )
+              )
+          </if>
+          <if test="menuParentId != null">
+              and parent_id = #{menuParentId}
+          </if>
+          and deleted = 0 order by id asc
+      </where>
+    </select>
+
+    <select id="findAvailablePermission" parameterType="map" resultType="permissionTree">
+        select m.id as `id`, m.parent_id as `pId`, m.title as `name`, if(isnull(s.menu_id), 0, 1) as `checked`
+        from sys_menu m left join (
+
+            select srm.menu_id from sys_menu sm
+            left join sys_role_menu_mapping srm on sm.id = srm.menu_id
+            <where>
+            <if test="roleId != null and roleId != ''">srm.role_id = #{roleId}</if>
+            </where>
+        ) s on m.id = s.menu_id
+    </select>
+
+    <delete id="deletePermission" parameterType="map">
+        delete from sys_role_menu_mapping
+       where role_id = #{roleId}
+    </delete>
+
+    <insert id="insertPermission" parameterType="map">
+        insert into sys_role_menu_mapping(role_id, menu_id)
+        values
+        <foreach collection="permissions" item="permissionId" index="index" separator=",">
+            (
+            #{roleId},
+            #{permissionId}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findPermissionsByUserId" parameterType="long" resultType="string">
+        select `name` from sys_menu where id in (
+          select distinct menu_id from sys_role_menu_mapping where role_id in (
+            select role_id from sys_role_user_mapping where user_id = #{userId}
+          )
+        )
+    </select>
+</mapper>

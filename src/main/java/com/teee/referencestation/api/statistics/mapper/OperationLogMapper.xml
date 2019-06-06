@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="operationLog">
+
+    <sql id="BASE_COLUMN">
+        id,
+        log_level,
+        operation_name,
+        content,
+        created_by,
+        created_date,
+        last_modified_by,
+        last_modified_date
+    </sql>
+
+    <select id="findUserByUsername" resultType="user" parameterType="string">
+        SELECT id,
+                username,
+                password,
+                salt,
+                real_name,
+                cell_phone_number
+        FROM sys_user
+        where username = #{username} and deleted = 0
+    </select>
+
+    <select id="getDataList" resultType="map" parameterType="map">
+        SELECT
+        <include refid="BASE_COLUMN" />
+        FROM operation_log
+        <where>
+            <if test="logLevel != null and logLevel != ''">
+                log_level = #{logLevel}
+            </if>
+            <if test="lessOperateDate != null and lessOperateDate != ''">
+                and created_date &lt;= #{lessOperateDate}
+            </if>
+            <if test="moreOperateDate != null and moreOperateDate != ''">
+                and created_date &gt;= #{moreOperateDate}
+            </if>
+            <if test="operationName != null and operationName != ''">
+                and operation_name like CONCAT('%',#{operationName},'%')
+            </if>
+        </where>
+        order by created_date desc
+    </select>
+
+    <insert id="insertOperationLog" parameterType="operationLog">
+        insert into operation_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="logLevel != null">
+                log_level,
+            </if>
+            <if test="operationName != null">
+                operation_name,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="createdBy != null">
+                created_by,
+            </if>
+            <if test="lastModifiedBy != null">
+                last_modified_by,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="logLevel != null">
+                #{logLevel, jdbcType=INTEGER},
+            </if>
+            <if test="operationName != null">
+                #{operationName, jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content, jdbcType=VARCHAR},
+            </if>
+            <if test="createdBy != null">
+                #{createdBy, jdbcType=INTEGER},
+            </if>
+            <if test="lastModifiedBy != null">
+                #{lastModifiedBy, jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+</mapper>

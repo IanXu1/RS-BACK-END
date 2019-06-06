@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="warningVisible">
+
+    <select id="findAllTypeByDuty" parameterType="int" resultType="int">
+        select wt.sub_type
+        from warning_visible wv left join warning_type wt
+        on wv.warning_type_id = wt.id
+        where wv.user_duty = #{duty}
+        and wv.visible = 1
+    </select>
+
+    <select id="findByTypeId" parameterType="map" resultType="com.teee.referencestation.api.sysmanage.model.WarningVisibleVo">
+        select id, warning_type_id, user_duty, visible, content
+        from warning_visible
+        where warning_type_id = #{typeId} and user_duty = #{duty}
+    </select>
+</mapper>

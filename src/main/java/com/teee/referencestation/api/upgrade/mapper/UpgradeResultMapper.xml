@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="upgradeResult">
+    <sql id="BASE_COLUMN">
+        id,
+        terminal_id,
+        pre_version_id,
+        after_version_id,
+        send_user_id,
+        state,
+        error_code,
+        created_by,
+        created_date,
+        last_modified_by,
+        last_modified_date
+    </sql>
+    <select id="getDataList" resultType="map" parameterType="map">
+        SELECT
+        <include refid="BASE_COLUMN" />
+        FROM upgrade_result
+        <where>
+            <if test="id != null and id != '' and id != 0">
+                id = #{id}
+            </if>
+            <if test="terminalId != null">
+                and terminal_id = #{terminalId}
+            </if>
+            <if test="preVersionId != null">
+                and pre_version_id = #{preVersionId}
+            </if>
+            <if test="afterVersionId != null">
+                and after_version_id = #{afterVersionId}
+            </if>
+            <if test="sendUserId != null">
+                and send_user_id = #{sendUserId}
+            </if>
+            <if test="state != null and state != ''">
+                and state = #{state}
+            </if>
+            <if test="errorCode != null">
+                and error_code = #{errorCode}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertUpgradeResultBatch" parameterType="list">
+        insert into `upgrade_result`(
+            `terminal_id`,
+            `pre_version_id`,
+            `after_version_id`,
+            `send_user_id`,
+            `state`,
+            `error_code`,
+            `created_by`,
+            `created_date`
+        )
+        values
+        <foreach collection="list" item="upgradeResult" index="index" separator=",">
+            (
+                #{upgradeResult.terminalId},
+                #{upgradeResult.preVersionId},
+                #{upgradeResult.afterVersionId},
+                #{upgradeResult.sendUserId},
+                #{upgradeResult.state},
+                #{upgradeResult.errorCode},
+                #{upgradeResult.createdBy},
+                #{upgradeResult.createdDate}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findUpgradeResultById" parameterType="long" resultType="upgradeResult">
+        SELECT
+        <include refid="BASE_COLUMN" />
+        FROM upgrade_result
+        where id = #{id}
+    </select>
+
+    <select id="findResultByTerminalIdAndVersionId" parameterType="map" resultType="upgradeResult">
+        SELECT
+        <include refid="BASE_COLUMN" />
+        FROM upgrade_result
+        <where>
+            <if test="stationId != NULL">
+                and terminal_id = #{stationId}
+            </if>
+            <if test="versionId != null">
+                and after_version_id = #{versionId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findLatestResultByTerminalId" parameterType="long" resultType="upgradeResult">
+        SELECT
+        <include refid="BASE_COLUMN" />
+        FROM upgrade_result
+        where terminal_id = #{terminalId}
+        order by created_date desc
+        limit 1
+    </select>
+
+    <update id="updateResultOnly" parameterType="upgradeResult">
+        update upgrade_result
+        <set>
+            <if test="terminalId != null">terminal_id = #{terminalId},</if>
+            <if test="preVersionId != null">pre_version_id = #{preVersionId},</if>
+            <if test="afterVersionId != null">after_version_id = #{afterVersionId},</if>
+            <if test="sendUserId != null">send_user_id = #{sendUserId},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="errorCode != null">error_code = #{errorCode},</if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

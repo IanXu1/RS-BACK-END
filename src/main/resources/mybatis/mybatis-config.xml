@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <properties>
+        <!-- mysql -->
+        <property name="dialect" value="mysql"/>
+    </properties>
+
+    <settings>
+        <!-- 这个配置使全局的映射器启用或禁用缓存 -->
+        <setting name="cacheEnabled" value="false"/>
+
+        <!-- 设置自动驼峰命名转换 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+
+        <!-- 设置是否使用JDBC的getGenereatedKeys方法获取
+             主键并赋值到keyProperty设置的领域模型属性中 -->
+        <setting name="useGeneratedKeys" value="true"/>
+
+        <!-- 允许在嵌套的statement中使用RowBounds
+             (Mybatis中的分页处理) -->
+        <setting name="safeRowBoundsEnabled" value="true"/>
+
+        <!-- 配置默认的执行器。
+            SIMPLE 无特殊处理。
+            REUSE能重利用预编译的Statement。
+            BATCH 能重利用预编译的Statement并支持批量更新 -->
+        <setting name="defaultExecutorType" value="REUSE"/>
+
+        <!-- 设置超时时间，它决定驱动等待一个数据库响应的时间 -->
+        <setting name="defaultStatementTimeout" value="600"/>
+
+        <setting name="callSettersOnNulls" value="true"/>
+
+        <!--<setting name="logImpl" value="LOG4J" />-->
+
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+
+    <typeAliases>
+        <!--这儿是为model配置别名，方便使用，后续按需添加-->
+        <typeAlias type="com.teee.referencestation.api.user.model.SysUser" alias="user"/>
+        <typeAlias type="com.teee.referencestation.api.user.model.SysRole" alias="role"/>
+        <typeAlias type="com.teee.referencestation.api.user.model.PermissionTree" alias="permissionTree"/>
+        <typeAlias type="com.teee.referencestation.api.user.model.SysPermission" alias="permission"/>
+        <typeAlias type="com.teee.referencestation.api.upgrade.model.UpgradeFile" alias="upgradeFile"/>
+        <typeAlias type="com.teee.referencestation.api.upgrade.model.UpgradeVersion" alias="upgradeVersion"/>
+        <typeAlias type="com.teee.referencestation.api.upgrade.model.UpgradeResult" alias="upgradeResult"/>
+        <typeAlias type="com.teee.referencestation.api.statistics.model.OperationLog" alias="operationLog"/>
+        <typeAlias type="com.teee.referencestation.api.sysmanage.model.DictionaryItem" alias="dicItem"/>
+    </typeAliases>
+
+    <typeHandlers>
+    </typeHandlers>
+
+    <!-- resultType为map时将key转换为驼峰 -->
+    <objectWrapperFactory type="com.teee.referencestation.config.datasource.MapWrapperFactory" />
+
+    <!--<plugins>-->
+        <!--&lt;!&ndash;自定义实现分页拦截器&ndash;&gt;-->
+        <!--<plugin interceptor="com.teee.referencestation.common.pagination.PaginationInterceptor"/>-->
+    <!--</plugins>-->
+</configuration>

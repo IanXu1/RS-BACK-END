@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="role">
+
+    <sql id="BASE_COLUMN">
+        id,
+        role_name,
+        remarks
+    </sql>
+
+    <select id="findRoleByUserId" resultType="com.teee.referencestation.api.user.model.SysRole" parameterType="long">
+        select r.id,
+                r.role_name,
+                r.remarks
+        from sys_role r left join sys_role_user_mapping ru on r.id = ru.role_id
+        where ru.user_id = #{userId};
+    </select>
+
+    <select id="getDataList" resultType="map" parameterType="map">
+        SELECT
+        <include refid="BASE_COLUMN"/>
+        FROM sys_role
+        <where>
+            <if test="id != null and id != '' and id != 0">
+                id = #{id}
+            </if>
+            <if test="roleName != null and roleName != ''">
+                and role_name like CONCAT('%',#{roleName},'%')
+            </if>
+            and deleted = 0
+        </where>
+    </select>
+
+    <select id="getRoleByName" resultType="map" parameterType="role">
+        SELECT
+        <include refid="BASE_COLUMN"/>
+        FROM sys_role
+        <where>
+            <if test="id != null and id != '' and id != 0">
+                id = #{id}
+            </if>
+            <if test="roleName != null and roleName != ''">
+                and role_name = #{roleName}
+            </if>
+            and deleted = 0
+        </where>
+    </select>
+
+    <select id="findUserIdByRoleId" resultType="integer" parameterType="long">
+      select user_id
+      from sys_role_user_mapping
+      where role_id = #{roleId}
+    </select>
+
+    <delete id="deleteAssignUser" parameterType="map">
+        delete from sys_role_user_mapping
+        <where>
+            <if test="roleId != null and roleId != 0">
+                role_id = #{roleId}
+            </if>
+            <if test="userId != null and userId != 0">
+                and user_id = #{userId}
+            </if>
+        </where>
+    </delete>
+
+    <insert id="insertAssignUser" parameterType="map">
+        insert into sys_role_user_mapping(role_id, user_id)
+        values
+        <foreach collection="assignUsers" item="userId" index="index" separator=",">
+            (
+            #{roleId},
+            #{userId}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findMappingByRoleAndUser" parameterType="map" resultType="map">
+        select role_id, user_id from sys_role_user_mapping where user_id = #{userId} and role_id = #{roleId}
+    </select>
+
+    <insert id="insertRole" parameterType="role">
+        insert into sys_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleName != null and roleName != ''">
+                role_name,
+            </if>
+            <if test="remarks != null and remarks != ''">
+                remarks,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="createdBy != null">
+                created_by,
+            </if>
+            <if test="lastModifiedBy != null">
+                last_modified_by,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleName != null and roleName != ''">
+                #{roleName},
+            </if>
+            <if test="remarks != null and remarks != ''">
+                #{remarks},
+            </if>
+            <if test="deleted != null">
+                #{deleted},
+            </if>
+            <if test="createdBy != null">
+                #{createdBy},
+            </if>
+            <if test="lastModifiedBy != null">
+                #{lastModifiedBy},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateRole">
+        update sys_role
+        <set>
+            <if test="roleName != null and roleName != ''">
+                role_name = #{roleName},
+            </if>
+            <if test="remarks != null and remarks != ''">
+                remarks = #{remarks},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted},
+            </if>
+            <if test="lastModifiedBy != null">
+                last_modified_by = #{lastModifiedBy},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectRoleById" parameterType="long" resultType="role">
+        select
+        <include refid="BASE_COLUMN" />
+        from sys_role
+        where id = #{roleId}
+    </select>
+
+    <select id="findRolesByUserId" parameterType="long" resultType="string">
+      select role_name from sys_role
+      where id in (
+        select role_id from sys_role_user_mapping where user_id = #{userId}
+      )
+    </select>
+
+    <update id="deleteRoleBatch" parameterType="map">
+        update sys_role
+        set deleted = 9
+        where id in(
+        <foreach collection="ids" item="id" index="index" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+</mapper>

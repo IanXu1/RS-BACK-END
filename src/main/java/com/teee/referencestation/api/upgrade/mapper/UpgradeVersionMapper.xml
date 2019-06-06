@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="upgradeVersion">
+
+    <sql id="BASE_COLUMN">
+        id,
+        version_num,
+        file_id,
+        send_user_id,
+        send_time,
+        state,
+        created_by,
+        created_date,
+        last_modified_by,
+        last_modified_date
+    </sql>
+
+    <select id="getDataList" resultType="upgradeVersion" parameterType="map">
+        SELECT
+        <include refid="BASE_COLUMN" />
+        FROM upgrade_version
+        <where>
+            <if test="id != null and id != 0">
+                id = #{id}
+            </if>
+            <if test="versionNum != null and versionNum != ''">
+                and version_num = #{versionNum}
+            </if>
+            <if test="state != null">
+                and state = #{state}
+            </if>
+            and deleted = 0
+        </where>
+        order by created_date desc
+    </select>
+
+    <insert id="insertUpgradeVersion" parameterType="upgradeVersion">
+        insert into upgrade_version
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="versionNum != null">
+                version_num,
+            </if>
+            <if test="fileId != null">
+                file_id,
+            </if>
+            <if test="sendUserId != null">
+                send_user_id,
+            </if>
+            <if test="sendTime != null">
+                send_time,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="createdBy != null">
+                created_by,
+            </if>
+            <if test="lastModifiedBy != null">
+                last_modified_by,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="versionNum != null">
+                #{versionNum, jdbcType=VARCHAR},
+            </if>
+            <if test="fileId != null">
+                #{fileId, jdbcType=INTEGER},
+            </if>
+            <if test="sendUserId != null">
+                #{sendUserId},
+            </if>
+            <if test="sendTime != null">
+                #{sendTime},
+            </if>
+            <if test="state != null">
+                #{state},
+            </if>
+            <if test="deleted != null">
+                #{deleted, jdbcType=INTEGER},
+            </if>
+            <if test="createdBy != null">
+                #{createdBy, jdbcType=INTEGER},
+            </if>
+            <if test="lastModifiedBy != null">
+                #{lastModifiedBy, jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateUpgradeVersion" parameterType="upgradeVersion">
+        update upgrade_version
+        <set>
+            <if test="versionNum != null">version_num = #{versionNum},</if>
+            <if test="fileId != null">file_id = #{fileId},</if>
+            <if test="sendUserId != null">send_user_id = #{sendUserId},</if>
+            <if test="sendTime != null">send_time = #{sendTime},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="lastModifiedBy != null">last_modified_by = #{lastModifiedBy},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="findUpgradeVersionById" resultType="upgradeVersion" parameterType="long">
+      select
+      <include refid="BASE_COLUMN" />
+      from upgrade_version
+      where id = #{id}
+    </select>
+
+    <select id="findLatestVersionByTerminalId" resultType="upgradeVersion" parameterType="long">
+      select
+        uv.id,
+        uv.version_num,
+        uv.file_id,
+        uv.send_user_id,
+        uv.send_time,
+        uv.state,
+        uv.created_by,
+        uv.created_date,
+        uv.last_modified_by,
+        uv.last_modified_date
+      from upgrade_result ur left join upgrade_version uv
+      on ur.after_version_id = uv.id and ur.terminal_id = #{id}
+      where ur.state = 1
+      order by uv.created_date desc
+      limit 1
+    </select>
+
+    <select id="findLatestVersion" resultType="upgradeVersion">
+      select
+      <include refid="BASE_COLUMN" />
+      from upgrade_version
+      where state = 1 or state = 9
+      order by created_date desc
+      limit 1
+    </select>
+
+    <select id="findLatestVersionByFileId" resultType="upgradeVersion" parameterType="long">
+      select
+      <include refid="BASE_COLUMN" />
+      from upgrade_version
+      where file_id = #{fileId}
+    </select>
+
+    <select id="findInitVersion" resultType="upgradeVersion">
+        select
+        <include refid="BASE_COLUMN" />
+        from upgrade_version
+        where state = 9
+        limit 1
+    </select>
+</mapper>

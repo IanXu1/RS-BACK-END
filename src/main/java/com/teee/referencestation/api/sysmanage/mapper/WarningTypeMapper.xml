@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="warningType">
+
+    <select id="getDataList" parameterType="map" resultType="map">
+        select id, `type`, sub_type, `name`, `level`
+        from warning_type
+        <where>
+            <if test="type != null and type != 0">
+                and `type` = #{type}
+            </if>
+            <if test="subType != null and subType != 0">
+                and sub_type = #{subType}
+            </if>
+            <if test="level != null and level != 0">
+                and level = #{level}
+            </if>
+            and `type` &lt;&gt; -1
+        </where>
+    </select>
+
+    <select id="loadCascadeData" parameterType="int" resultType="com.teee.referencestation.api.sysmanage.model.WarningTypeVo">
+        SELECT `sub_type` as type, `name`, `level`
+        FROM warning_type
+        where `type` = #{type}
+    </select>
+
+    <select id="loadWarningTypeBySubType" parameterType="map" resultType="com.teee.referencestation.api.sysmanage.model.WarningTypeVo">
+        SELECT `sub_type` as type, `name`, `level`, id
+        FROM warning_type
+        where `type` = #{type} and `sub_type` = #{subType}
+    </select>
+
+    <select id="findById" parameterType="long" resultType="map">
+        select id, `type`, sub_type, `name`, `level`
+        from warning_type
+        where id = #{id}
+    </select>
+
+    <update id="updateType" parameterType="map" >
+        update warning_type
+        <set>
+            <if test="type != null and type != 0">
+                type = #{type},
+            </if>
+            <if test="subType != null and subType != 0">
+                sub_type = #{subType}
+            </if>
+            <if test="level != null and level != 0">
+                level = #{level}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

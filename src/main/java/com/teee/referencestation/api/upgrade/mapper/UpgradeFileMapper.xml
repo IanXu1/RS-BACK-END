@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="upgradeFile">
+    <sql id="BASE_COLUMN">
+        id,
+        file_name,
+        file_size,
+        file_path,
+        file_type,
+        md5,
+        state,
+        created_by,
+        created_date,
+        last_modified_by,
+        last_modified_date
+    </sql>
+
+    <select id="getDataList" resultType="map" parameterType="upgradeFile">
+        SELECT
+        <include refid="BASE_COLUMN"/>
+        FROM upgrade_file
+        <where>
+            <if test="id != null and id != '' and id != 0">
+                id = #{id}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                and file_name like CONCAT('%',#{fileName},'%')
+            </if>
+            <if test="fileType != null and fileType != ''">
+                and file_type = #{fileType}
+            </if>
+            <if test="state != null and state != ''">
+                and state = #{state}
+            </if>
+            and deleted = 0
+        </where>
+        order by created_date desc
+    </select>
+
+    <insert id="insertUpgradeFile" parameterType="upgradeFile">
+        insert into upgrade_file
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fileName != null">
+                file_name,
+            </if>
+            <if test="fileSize != null">
+                file_size,
+            </if>
+            <if test="filePath != null">
+                file_path,
+            </if>
+            <if test="fileType != null">
+                file_type,
+            </if>
+            <if test="md5 != null">
+                md5,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="createdBy != null">
+                created_by,
+            </if>
+            <if test="lastModifiedBy != null">
+                last_modified_by,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fileName != null">
+                #{fileName, jdbcType=VARCHAR},
+            </if>
+            <if test="fileSize != null">
+                #{fileSize, jdbcType=INTEGER},
+            </if>
+            <if test="filePath != null">
+                #{filePath, jdbcType=VARCHAR},
+            </if>
+            <if test="fileType != null">
+                #{fileType, jdbcType=INTEGER},
+            </if>
+            <if test="md5 != null">
+                #{md5, jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state, jdbcType=INTEGER},
+            </if>
+            <if test="deleted != null">
+                #{deleted, jdbcType=INTEGER},
+            </if>
+            <if test="createdBy != null">
+                #{createdBy, jdbcType=INTEGER},
+            </if>
+            <if test="lastModifiedBy != null">
+                #{lastModifiedBy, jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="findUpgradeFileById" parameterType="long" resultType="upgradeFile">
+        SELECT
+        <include refid="BASE_COLUMN"/>
+        FROM upgrade_file
+        where id = #{id}
+    </select>
+
+    <update id="deleteUpgradeFileById" parameterType="long">
+        update upgrade_file
+        set deleted = 9
+        where id = #{id}
+    </update>
+
+    <select id="loadAvailableFile" resultType="map" parameterType="map">
+        select
+        <include refid="BASE_COLUMN"/>
+        from upgrade_file
+        <where>
+            <if test="name != null and name != ''">
+               and file_name = #{name}
+            </if>
+            and deleted = 0 and state != 9
+        </where>
+        order by created_date desc
+    </select>
+
+    <update id="updateUpgradeFile" parameterType="upgradeFile">
+        update upgrade_file
+        <set>
+            <if test="fileName != null">file_name = #{fileName},</if>
+            <if test="fileSize != null">file_size = #{fileSize},</if>
+            <if test="filePath != null">file_path = #{filePath},</if>
+            <if test="fileType != null">file_type = #{fileType},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="lastModifiedBy != null">last_modified_by = #{lastModifiedBy},</if>
+            <if test="lastModifiedDate != null">last_modified_date = #{lastModifiedDate},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="deleteUpgradeFileBatch" parameterType="map">
+        update upgrade_file
+        set deleted = 9
+        where id in(
+        <foreach collection="ids" item="id" index="index" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+
+    <select id="loadUpgradeFileByMd5" parameterType="string" resultType="upgradeFile">
+        SELECT
+        <include refid="BASE_COLUMN"/>
+        FROM upgrade_file
+        where md5 = #{md5} and deleted = 0
+    </select>
+
+</mapper>

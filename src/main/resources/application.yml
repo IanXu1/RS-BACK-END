@@ -1,0 +1,201 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    # 切换环境 dev：开发 test：测试 prod：生产
+    active: prod
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+    static-path-pattern: /**
+  resources:
+    add-mappings: false
+  servlet:
+    #配置上传文件大小限制
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  # Email Setting
+  mail:
+    protocol: smtp
+    host: smtp.qq.com
+    username: 2311869040
+    password: bpberqmyvzsgeahb
+    from: 2311869040@qq.com
+    port: 465
+    default-encoding: UTF-8
+    properties.mail.smtp.auth: true
+    properties.mail.smtp.port: 465
+    properties.mail.display.sendmail: teeechina
+    properties.mail.display.sendname: teeechina.com #可以任意
+    properties.mail.smtp.starttls.enable: true
+    properties.mail.smtp.starttls.required: true
+    properties.mail.smtp.ssl.enable: true
+
+logging:
+  config: classpath:log/logback-spring.xml
+
+mybatis:
+  mapperLocations: classpath*:com/teee/referencestation/**/mapper/*.xml
+  config-location: classpath:/mybatis/mybatis-config.xml
+
+# pageHelper分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+#------------------------------------------------------------
+# SMS Setting
+#------------------------------------------------------------
+SMS_UID:
+  roydotchen
+SMS_KRY:
+  216c2e8624f238f6484a
+
+# 本机开发
+---
+spring:
+  profiles: dev
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/basestation?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
+    platform: mysql
+    username: root
+    password: 123456
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    logSlowSql: true
+    slowSqlMill: 5000
+    mergeSql: true
+
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password: admin
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+      timeout: 3000ms
+    expireTime: 180
+  transaction:
+    rollback-on-commit-failure: true
+
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+      buffered: true
+      directory: D:\tmp\access-log
+      file-date-format: .yyyy-MM-dd
+      prefix: access_log
+      suffix: .log
+      rotate: true
+
+swagger:
+  enable: true
+
+logback:
+  path: D:/DevLogs/地基站
+
+teee:
+  upgrade:
+    temp: D:\temp\
+    store: D:\teee\upgrade\
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics, loggers, prometheus
+        exclude:
+      base-path: "/"
+    health:
+      show-details: always
+  health:
+    db:
+      enabled: true
+    redis:
+      enabled: true
+    diskspace:
+      enabled: true
+
+# 测试
+---
+spring:
+  profiles: test
+  druid:
+    url: jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
+    username: root
+    password: 123456
+
+# 生产
+---
+spring:
+  profiles: prod
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/basestation?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
+    platform: mysql
+    username: Taichina
+    password: 123456
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    logSlowSql: true
+    slowSqlMill: 5000
+    mergeSql: true
+
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+      timeout: 3000ms
+    expireTime: 180
+  transaction:
+    rollback-on-commit-failure: true
+
+swagger:
+  enable: false
+
+logback:
+  path: /var/log/rs/web/tomcat
+
+teee:
+  upgrade:
+    temp: /usr/local/src/rs/web/upgrade/temp/
+    store: /usr/local/src/rs/web/upgrade/store/

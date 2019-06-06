@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="warningUserMapping">
+
+    <select id="checkUserMappingExists" parameterType="map" resultType="map">
+        SELECT warning_type_id
+        FROM warning_user_mapping
+        <where>
+            <if test="warningTypeId != null">
+                and warning_type_id = #{warningTypeId}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertUserMapping" parameterType="map">
+        insert into warning_user_mapping (warning_type_id, user_id)
+        values (#{warningTypeId}, #{userId})
+    </insert>
+
+    <delete id="deleteUserMapping" parameterType="map">
+        delete from warning_user_mapping
+        where warning_type_id = #{warningTypeId} and user_id = #{userId}
+    </delete>
+
+    <select id="selectMappingByTypeId" parameterType="long" resultType="long">
+        select user_id from warning_user_mapping
+        where warning_type_id = #{typeId}
+    </select>
+</mapper>
